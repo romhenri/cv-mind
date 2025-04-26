@@ -1,33 +1,33 @@
-%%% PONTUAÇÃO DE CANDIDATOS %%%
+%%% CANDIDATE SCORING %%%
 
-:- module(score, [pontuacao/3, melhores_candidatos/3]).
+:- module(score, [score/3, best_candidates/3]).
 
-pontuacao(CandidatoID, VagaID, Pontuacao) :-
-    candidato(CandidatoID, _, _, _, _, ProExpYears, Techs, _),
-    vaga(VagaID, _, _, _, _, _, Obrigatorias, Desejaveis, ExpMin),
+score(CandidateID, JobID, Score) :-
+    candidate(CandidateID, _, _, _, _, ProExpYears, Techs, _),
+    job(JobID, _, _, _, _, _, Required, Desired, Min_Exp),
 
-    % Pontuação por experiência além do mínimo
-    PontosExp is max(0, ProExpYears - ExpMin),
+    % Score for experience beyond minimum
+    ExpPoints is max(0, ProExpYears - Min_Exp),
 
-    % Pontuação pelas habilidades obrigatórias dominadas
-    intersection(Obrigatorias, Techs, TecnologiasObrigatorias),
-    length(TecnologiasObrigatorias, PontosObrigatorias),
+    % Score for required skills
+    intersection(Required, Techs, RequiredTechs),
+    length(RequiredTechs, RequiredPoints),
 
-    % Pontuação pelas habilidades desejáveis dominadas
-    intersection(Techs, Desejaveis, TecnologiasDesejaveis),
-    length(TecnologiasDesejaveis, PontosDesejaveis),
+    % Score for desired skills
+    intersection(Techs, Desired, DesiredTechs),
+    length(DesiredTechs, DesiredPoints),
 
-    % Pontuação total
-    Pontuacao is PontosExp + PontosObrigatorias + PontosDesejaveis.
+    % Total score
+    Score is ExpPoints + RequiredPoints + DesiredPoints.
 
-melhores_candidatos(VagaID, N, Melhores) :-
-    findall(Pont-Cand, (
-        filter:tem_qualificacao_minima(Cand, VagaID),
-        pontuacao(Cand, VagaID, Pont)
-    ), Candidatos),
-    sort(1, @>=, Candidatos, Ordenados),
-    pegar_primeiros(N, Ordenados, Melhores).
+best_candidates(JobID, N, Best) :-
+    findall(Score-Cand, (
+        filter:has_minimum_qualifications(Cand, JobID),
+        score(Cand, JobID, Score)
+    ), Candidates),
+    sort(1, @>=, Candidates, Sorted),
+    get_first(N, Sorted, Best).
 
-pegar_primeiros(N, Lista, Primeiros) :-
-    length(Primeiros, N),
-    append(Primeiros, _, Lista).
+get_first(N, List, First) :-
+    length(First, N),
+    append(First, _, List).

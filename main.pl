@@ -1,96 +1,96 @@
-%%% SISTEMA DE SELEÇÃO DE CURRÍCULOS EM PROLOG %%%
+%%% RESUME SELECTION SYSTEM IN PROLOG %%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% 1. BASE DE DADOS - VAGAS E CANDIDATOS %%%
+%%% 1. DATABASE - JOBS AND CANDIDATES %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 :- consult('candidates.pl').
-:- consult('vagas.pl').
+:- consult('jobs.pl').
 :- use_module(filter).
 :- use_module(score).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% 2. INICIALIZAÇÃO DO SISTEMA %%%
+%%% 2. SYSTEM INITIALIZATION %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- initialization(iniciar_sistema).
+:- initialization(system_start).
 
-iniciar_sistema :-
-    write('Sistema de Selecao de Curriculos carregado.'), nl,
-    write('Digite "menu." para iniciar a interface interativa.'), nl.
+system_start :-
+    write('Resume Selection System loaded.'), nl,
+    write('Type "menu." to start the interactive interface.'), nl.
 
 menu :-
     nl,
-    write('=== SISTEMA DE SELECAO DE CURRICULOS ==='), nl,
-    write('1. Listar vagas disponiveis'), nl,
-    write('2. Listar candidatos cadastrados'), nl,
-    write('3. Ver candidatos qualificados para uma vaga'), nl,
-    write('4. Ver melhores candidatos para uma vaga'), nl,
-    write('0. Sair'), nl,
-    write('Opcao: '),
-    read(Opcao),
-    tratar_opcao(Opcao).
+    write('=== RESUME SELECTION SYSTEM ==='), nl,
+    write('1. List available jobs'), nl,
+    write('2. List registered candidates'), nl,
+    write('3. View qualified candidates for a job'), nl,
+    write('4. View best candidates for a job'), nl,
+    write('0. Exit'), nl,
+    write('Option: '),
+    read(Option),
+    handle_option(Option).
 
-tratar_opcao(0) :- !, write('Saindo do sistema...'), nl.
-tratar_opcao(1) :- listar_vagas, menu.
-tratar_opcao(2) :- listar_candidatos, menu.
-tratar_opcao(3) :- consultar_qualificados, menu.
-tratar_opcao(4) :- consultar_melhores, menu.
-tratar_opcao(_) :- write('Opcao invalida!'), nl, menu.
+handle_option(0) :- !, write('Exiting system...'), nl.
+handle_option(1) :- list_jobs, menu.
+handle_option(2) :- list_candidates, menu.
+handle_option(3) :- consult_qualified, menu.
+handle_option(4) :- consult_best, menu.
+handle_option(_) :- write('Invalid option!'), nl, menu.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% 3. FUNÇÕES DE LISTAGEM %%%
+%%% 3. LISTING FUNCTIONS %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-listar_vagas :-
-    write('=== VAGAS DISPONIVEIS ==='), nl,
-    forall(vaga(ID, Titulo, Area, CursoAlvo, CRA_Min, PeriodoMin, Obrigatorias, Desejaveis, ExpMin),
-           (write('ID: '), write(ID), write(' - '), write(Titulo), nl,
+list_jobs :-
+    write('=== AVAILABLE JOBS ==='), nl,
+    forall(job(ID, Title, Area, TargetCourse, Min_CRA, Min_Semester, Required, Desired, Min_Exp),
+           (write('ID: '), write(ID), write(' - '), write(Title), nl,
             write('  Area: '), write(Area), nl,
-            write('  Curso Alvo: '), write(CursoAlvo), nl,
-            write('  CRA Minimo: '), write(CRA_Min), nl,
-            write('  Periodo Minimo: '), write(PeriodoMin), nl,
-            write('  Skills Obrigatorias: '), write(Obrigatorias), nl,
-            write('  Skills Desejaveis: '), write(Desejaveis), nl,
-            write('  Experiencia Minima: '), write(ExpMin), write(' anos'), nl, nl)).
+            write('  Target Course: '), write(TargetCourse), nl,
+            write('  Minimum CRA: '), write(Min_CRA), nl,
+            write('  Minimum Semester: '), write(Min_Semester), nl,
+            write('  Required Skills: '), write(Required), nl,
+            write('  Desired Skills: '), write(Desired), nl,
+            write('  Minimum Experience: '), write(Min_Exp), write(' years'), nl, nl)).
 
-listar_candidatos :-
-    write('=== CANDIDATOS CADASTRADOS ==='), nl,
-    forall(candidato(ID, Nome, CRA, Periodo, Curso, ProExpYears, Techs, Interests),
-           (write('ID: '), write(ID), write(' - '), write(Nome), nl,
+list_candidates :-
+    write('=== REGISTERED CANDIDATES ==='), nl,
+    forall(candidate(ID, Name, CRA, Semester, Course, ProExpYears, Techs, Interests),
+           (write('ID: '), write(ID), write(' - '), write(Name), nl,
             write('  CRA: '), write(CRA), nl,
-            write('  Periodo: '), write(Periodo), nl,
-            write('  Curso: '), write(Curso), nl,
-            write('  Experiencia Profissional: '), write(ProExpYears), write(' anos'), nl,
-            write('  Tecnologias: '), write(Techs), nl,
-            write('  Areas de Interesse: '), write(Interests), nl, nl)).
+            write('  Semester: '), write(Semester), nl,
+            write('  Course: '), write(Course), nl,
+            write('  Professional Experience: '), write(ProExpYears), write(' years'), nl,
+            write('  Technologies: '), write(Techs), nl,
+            write('  Interest Areas: '), write(Interests), nl, nl)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% 4. CONSULTAS DE FILTRO E RANKING %%%
+%%% 4. FILTER AND RANKING QUERIES %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-consultar_qualificados :-
-    write('ID da Vaga: '), read(VagaID),
-    filter:candidatos_qualificados(VagaID, Lista),
-    ( Lista == [] ->
-        write('Nenhum candidato qualificado encontrado.'), nl
+consult_qualified :-
+    write('Job ID: '), read(JobID),
+    filter:qualified_candidates(JobID, List),
+    ( List == [] ->
+        write('No qualified candidates found.'), nl
     ;
-        write('Candidatos qualificados:'), nl,
-        forall(member(ID, Lista),
-               (candidato(ID, Nome, _, _, _, _, _, _),
-                write('ID: '), write(ID), write(' - '), writeln(Nome)))
+        write('Qualified candidates:'), nl,
+        forall(member(ID, List),
+               (candidate(ID, Name, _, _, _, _, _, _),
+                write('ID: '), write(ID), write(' - '), writeln(Name)))
     ).
 
-consultar_melhores :-
-    write('ID da Vaga: '), read(VagaID),
-    write('Quantos candidatos deseja listar? '), read(N),
-    score:melhores_candidatos(VagaID, N, Melhores),
-    ( Melhores == [] ->
-        write('Nenhum candidato qualificado encontrado.'), nl
+consult_best :-
+    write('Job ID: '), read(JobID),
+    write('How many candidates to list? '), read(N),
+    score:best_candidates(JobID, N, Best),
+    ( Best == [] ->
+        write('No qualified candidates found.'), nl
     ;
-        write('Melhores candidatos:'), nl,
-        forall(member(Pont-ID, Melhores),
-               (candidato(ID, Nome, _, _, _, _, _, _),
-                write('ID: '), write(ID), write(' - '), write(Nome),
-                write(' (Pontuacao: '), write(Pont), writeln(')')))
+        write('Best candidates:'), nl,
+        forall(member(Score-ID, Best),
+               (candidate(ID, Name, _, _, _, _, _, _),
+                write('ID: '), write(ID), write(' - '), write(Name),
+                write(' (Score: '), write(Score), writeln(')')))
     ).

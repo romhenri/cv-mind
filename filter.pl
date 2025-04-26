@@ -1,16 +1,16 @@
-%%% FILTRO DE CANDIDATOS %%%
+%%% CANDIDATE FILTER %%%
 
-:- module(filter, [tem_qualificacao_minima/2, candidatos_qualificados/2]).
+:- module(filter, [has_minimum_qualifications/2, qualified_candidates/2]).
 
-tem_qualificacao_minima(CandidatoID, VagaID) :-
-    candidato(CandidatoID, _, CRA, Periodo, Curso, _, _, Interests),
-    vaga(VagaID, _, AreaInteresse, CursoAlvo, CRA_Min, PeriodoMin, _, _, _),
+has_minimum_qualifications(CandidateID, JobID) :-
+    candidate(CandidateID, _, CRA, Semester, Course, _, _, Interests),
+    job(JobID, _, InterestAreaNeeded, TargetCourse, Min_CRA_Needed, Min_SemesterNeeded, _, _, _),
 
-    % Filtros obrigatórios
-    CRA >= CRA_Min,
-    Periodo >= PeriodoMin,
-    Curso == CursoAlvo,
-    member(AreaInteresse, Interests).
+    % Mandatory filters
+    CRA >= Min_CRA_Needed,
+    Semester >= Min_SemesterNeeded,
+    Course == TargetCourse,
+    member(InterestAreaNeeded, Interests).
 
-candidatos_qualificados(VagaID, Lista) :-
-    findall(CandidatoID, tem_qualificacao_minima(CandidatoID, VagaID), Lista).
+qualified_candidates(JobID, List) :-
+    findall(CandidateID, has_minimum_qualifications(CandidateID, JobID), List).
