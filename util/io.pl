@@ -3,7 +3,7 @@
     ask_string/2,
     ask_list_of_strings/2,
     ask_option/2,
-    print_job/9,
+    print_job/8,
     print_candidate/8,
     print_list_separator/0
 ]).
@@ -42,14 +42,13 @@ flush_input_buffer :-
 
 % ========== OUTPUTS ==========
 
-print_job(ID, Title, Area, Course, MinCRA, MinSemester, RequiredSkills, DesiredSkills, MinExp) :-
+print_job(ID, Title, Area, Course, MinCRA, MinSemester, DesiredSkills, MinExp) :-
     write('ID: '), write(ID), nl,
     write('Title: '), write(Title), nl,
     write('Area: '), write(Area), nl,
     write('Target Course: '), write(Course), nl,
     write('Minimum CRA: '), write(MinCRA), nl,
     write('Minimum Semester: '), write(MinSemester), nl,
-    write('Required Skills: '), write(RequiredSkills), nl,
     write('Desired Skills: '), write(DesiredSkills), nl,
     write('Minimum Experience: '), write(MinExp), write(' years'), nl.
 

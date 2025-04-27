@@ -1,6 +1,6 @@
 %%% RESUME SELECTION SYSTEM IN PROLOG %%%
 
-:- dynamic job/9.
+:- dynamic job/8.
 :- dynamic candidate/8.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -52,8 +52,8 @@ handle_option(_) :- write('Invalid option!'), nl, menu.
 
 list_jobs :-
     write('=== AVAILABLE JOBS ==='), nl,
-    forall(job(ID, Title, Area, TargetCourse, Min_CRA, Min_Semester, Required, Desired, Min_Exp),
-           (io:print_job(ID, Title, Area, TargetCourse, Min_CRA, Min_Semester, Required, Desired, Min_Exp),
+    forall(job(ID, Title, Area, TargetCourse, Min_CRA, Min_Semester, Desired, Min_Exp),
+           (io:print_job(ID, Title, Area, TargetCourse, Min_CRA, Min_Semester, Desired, Min_Exp),
             io:print_list_separator)).
 
 list_candidates :-
@@ -79,7 +79,6 @@ input_job :-
     io:ask_string('Target course: ', Course),
     io:ask_number('Minimum CRA: ', MinCRA),
     io:ask_number('Minimum semester: ', MinSemester),
-    io:ask_list_of_strings('Required skills (comma separated): ', RequiredList),
     io:ask_list_of_strings('Desired skills (comma separated): ', DesiredList),
     io:ask_number('Minimum experience (years): ', MinExp),
 
@@ -88,12 +87,12 @@ input_job :-
         write('Input canceled due to invalid fields.'), nl, menu
     ;
         % Otherwise, create the job
-        assertz(job(ID, Title, Area, Course, MinCRA, MinSemester, RequiredList, DesiredList, MinExp)),
+        assertz(job(ID, Title, Area, Course, MinCRA, MinSemester, DesiredList, MinExp)),
 
         % Confirmation
         nl, write('New job successfully added!'), nl,
         io:print_list_separator,
-        io:print_job(ID, Title, Area, Course, MinCRA, MinSemester, RequiredList, DesiredList, MinExp),
+        io:print_job(ID, Title, Area, Course, MinCRA, MinSemester, DesiredList, MinExp),
         io:print_list_separator,
 
         % Show qualified candidates

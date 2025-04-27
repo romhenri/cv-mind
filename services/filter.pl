@@ -4,10 +4,10 @@
 
 has_minimum_qualifications(CandidateID, JobID) :-
     % Get candidate data
-    candidate(CandidateID, _, CRA, Semester, CandidateCourse, _, CandidateTechs, CandidateInterests),
+    candidates:candidate(CandidateID, _, CRA, Semester, CandidateCourse, _, _, CandidateInterests),
     
     % Get job data
-    job(JobID, _, JobInterestArea, JobTargetCourse, MinCRA, MinSemester, RequiredTechs, _, _),
+    job(JobID, _, JobInterestArea, JobTargetCourse, MinCRA, MinSemester, _, _),
     
     % 1. Check academic requirements
     CRA >= MinCRA,
@@ -21,13 +21,8 @@ has_minimum_qualifications(CandidateID, JobID) :-
     % 3. Check interest area match (case insensitive)
     normalize_interest_areas(CandidateInterests, NormalizedCandidateInterests),
     normalize_string(JobInterestArea, NormalizedJobInterest),
-    member(NormalizedJobInterest, NormalizedCandidateInterests),
+    member(NormalizedJobInterest, NormalizedCandidateInterests).
     
-    % 4. Check required technologies (case and space insensitive)
-    maplist(normalize_tech, RequiredTechs, NormalizedRequiredTechs),
-    maplist(normalize_tech, CandidateTechs, NormalizedCandidateTechs),
-    subset(NormalizedRequiredTechs, NormalizedCandidateTechs).
-
 % String normalization (lowercase and remove spaces)
 normalize_string(String, Normalized) :-
     atom_string(String, Str),

@@ -4,21 +4,17 @@
 
 score(CandidateID, JobID, Score) :-
     candidate(CandidateID, _, _, _, _, ProExpYears, Techs, _),
-    job(JobID, _, _, _, _, _, Required, Desired, Min_Exp),
+    job(JobID, _, _, _, _, _, Desired, Min_Exp),
 
     % Score for experience beyond minimum
     ExpPoints is max(0, ProExpYears - Min_Exp),
-
-    % Score for required skills
-    intersection(Required, Techs, RequiredTechs),
-    length(RequiredTechs, RequiredPoints),
 
     % Score for desired skills
     intersection(Techs, Desired, DesiredTechs),
     length(DesiredTechs, DesiredPoints),
 
     % Total score
-    Score is ExpPoints + RequiredPoints + DesiredPoints.
+    Score is ExpPoints + DesiredPoints.
 
 best_candidates(JobID, N, Best) :-
     findall(Score-Cand, (
