@@ -1,15 +1,20 @@
-:- dynamic job/9.
-
 %%% RESUME SELECTION SYSTEM IN PROLOG %%%
 
+:- dynamic job/9.
+:- dynamic candidate/8.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% 1. DATABASE - JOBS AND CANDIDATES %%%
+%%% 1. MODULES AND DATABASES %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- consult('candidates.pl').
-:- consult('jobs.pl').
-:- use_module(filter).
-:- use_module(score).
+:- consult('data/candidates.pl').
+:- consult('data/jobs.pl').
+
+:- use_module('services/filter').
+:- use_module('services/score').
+
+:- use_module('util/io').
+:- use_module('util/util').
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% 2. SYSTEM INITIALIZATION %%%
@@ -24,22 +29,21 @@ system_start :-
 menu :-
     nl,
     write('=== RESUME SELECTION SYSTEM ==='), nl,
-    write('1. List available jobs'), nl,
-    write('2. List registered candidates'), nl,
-    write('3. View qualified candidates for a job'), nl,
-    write('4. View best candidates for a job'), nl,
-    write('5. Input a new job'), nl,
+    write('1. Input a job for recommendation'), nl,
+    write('2. List available jobs'), nl,
+    write('3. List registered candidates'), nl,
+    write('4. Filter qualified candidates for a job'), nl,
+    write('5. Recommend best candidates for a job'), nl,
     write('0. Exit'), nl,
-    write('Option: '),
-    read(Option),
+    io:ask_option('Option: ', Option),
     handle_option(Option).
 
+handle_option(1) :- input_job, menu.
+handle_option(2) :- list_jobs, menu.
+handle_option(3) :- list_candidates, menu.
+handle_option(4) :- consult_qualified, menu.
+handle_option(5) :- consult_best, menu.
 handle_option(0) :- !, write('Exiting system...'), nl.
-handle_option(1) :- list_jobs, menu.
-handle_option(2) :- list_candidates, menu.
-handle_option(3) :- consult_qualified, menu.
-handle_option(4) :- consult_best, menu.
-handle_option(5) :- input_job, menu.
 handle_option(_) :- write('Invalid option!'), nl, menu.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -49,25 +53,14 @@ handle_option(_) :- write('Invalid option!'), nl, menu.
 list_jobs :-
     write('=== AVAILABLE JOBS ==='), nl,
     forall(job(ID, Title, Area, TargetCourse, Min_CRA, Min_Semester, Required, Desired, Min_Exp),
-           (write('ID: '), write(ID), write(' - '), write(Title), nl,
-            write('  Area: '), write(Area), nl,
-            write('  Target Course: '), write(TargetCourse), nl,
-            write('  Minimum CRA: '), write(Min_CRA), nl,
-            write('  Minimum Semester: '), write(Min_Semester), nl,
-            write('  Required Skills: '), write(Required), nl,
-            write('  Desired Skills: '), write(Desired), nl,
-            write('  Minimum Experience: '), write(Min_Exp), write(' years'), nl, nl)).
+           (io:print_job(ID, Title, Area, TargetCourse, Min_CRA, Min_Semester, Required, Desired, Min_Exp),
+            io:print_list_separator)).
 
 list_candidates :-
     write('=== REGISTERED CANDIDATES ==='), nl,
     forall(candidate(ID, Name, CRA, Semester, Course, ProExpYears, Techs, Interests),
-           (write('ID: '), write(ID), write(' - '), write(Name), nl,
-            write('  CRA: '), write(CRA), nl,
-            write('  Semester: '), write(Semester), nl,
-            write('  Course: '), write(Course), nl,
-            write('  Professional Experience: '), write(ProExpYears), write(' years'), nl,
-            write('  Technologies: '), write(Techs), nl,
-            write('  Interest Areas: '), write(Interests), nl, nl)).
+           (io:print_candidate(ID, Name, CRA, Semester, Course, ProExpYears, Techs, Interests),
+            io:print_list_separator)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% 4. JOB INPUT FUNCTIONALITY %%%
@@ -76,76 +69,55 @@ list_candidates :-
 input_job :-
     nl,
     write('=== INPUT NEW JOB DETAILS ==='), nl,
-    flush_output,
-    
-    % Get new job ID
-    write('Enter job ID: '),
-    flush_output,
-    read(ID),
-    skip_line,
-    
-    % Verify if ID already exists
-    (job(ID, _, _, _, _, _, _, _, _) ->
-        (write('Error: Job ID already exists!'), nl, nl, menu)
+
+    generate_job_id(ID),
+    format('Generated Job ID: ~w~n', [ID]),
+
+    % Collect all job details
+    io:ask_string('Job title: ', Title),
+    io:ask_string('Interest area: ', Area),
+    io:ask_string('Target course: ', Course),
+    io:ask_number('Minimum CRA: ', MinCRA),
+    io:ask_number('Minimum semester: ', MinSemester),
+    io:ask_list_of_strings('Required skills (comma separated): ', RequiredList),
+    io:ask_list_of_strings('Desired skills (comma separated): ', DesiredList),
+    io:ask_number('Minimum experience (years): ', MinExp),
+
+    % Validation step
+    ( invalid_input(Title, Area, Course, MinCRA, MinSemester, MinExp) ->
+        write('Input canceled due to invalid fields.'), nl, menu
     ;
-        % Collect all job details
-        write('Job title: '), 
-        read_line_to_string(user_input, Title),
-        
-        write('Interest area: '),
-        read_line_to_string(user_input, Area),
-        
-        write('Target course (ex: "Computer Engineering"): '),
-        read_line_to_string(user_input, Course),
-        
-        write('Minimum CRA: '),
-        read_number(MinCRA),
-        
-        write('Minimum semester: '),
-        read_number(MinSemester),
-        
-        write('Required skills (comma separated, e.g., "python,sql,docker"): '),
-        read_line_to_string(user_input, RequiredStr),
-        split_string(RequiredStr, ",", " ", RequiredParts),
-        maplist(string_trim, RequiredParts, RequiredList),
-        
-        write('Desired skills (comma separated, e.g., "aws,git,ml"): '),
-        read_line_to_string(user_input, DesiredStr),
-        split_string(DesiredStr, ",", " ", DesiredParts),
-        maplist(string_trim, DesiredParts, DesiredList),
-        
-        write('Minimum experience (years): '),
-        read_number(MinExp),
-        
-        % Assert the new job
+        % Otherwise, create the job
         assertz(job(ID, Title, Area, Course, MinCRA, MinSemester, RequiredList, DesiredList, MinExp)),
-        
-        % Display confirmation
-        nl, write('New job successfully added!'), nl, nl,
-        display_job_details(ID, Title, Area, Course, MinCRA, MinSemester, RequiredList, DesiredList, MinExp),
-        
-        % Mostrar candidatos qualificados
+
+        % Confirmation
+        nl, write('New job successfully added!'), nl,
+        io:print_list_separator,
+        io:print_job(ID, Title, Area, Course, MinCRA, MinSemester, RequiredList, DesiredList, MinExp),
+        io:print_list_separator,
+
+        % Show qualified candidates
         nl, write('=== QUALIFIED CANDIDATES FOR THIS JOB ==='), nl,
         (filter:qualified_candidates(ID, QualifiedList) ->
             (QualifiedList == [] ->
                 write('No qualified candidates found.'), nl
             ;
                 forall(member(CandID, QualifiedList),
-                    (candidate(CandID, Name, _, _, _, _, _, _),
-                     write('ID: '), write(CandID), write(' - '), writeln(Name)))
+                       (candidate(CandID, Name, _, _, _, _, _, _),
+                        write('ID: '), write(CandID), write(' - '), writeln(Name)))
             ),
-            
-            % Chamar diretamente a lógica de melhores candidatos (igual à opção 4)
+
+            % Show best candidates
             nl, nl, write('=== BEST CANDIDATES FOR THIS JOB ==='), nl,
-            write('How many candidates to list? '), read(N), nl,
+            io:ask_number('How many candidates to list? ', N),
             score:best_candidates(ID, N, Best),
-            ( Best == [] ->
+            (Best == [] ->
                 write('No qualified candidates found.'), nl
             ;
                 forall(member(Score-CandID, Best),
-                    (candidate(CandID, Name, _, _, _, _, _, _),
-                     write('ID: '), write(CandID), write(' - '), write(Name),
-                     write(' (Score: '), write(Score), writeln(')')))
+                       (candidate(CandID, Name, _, _, _, _, _, _),
+                        write('ID: '), write(CandID), write(' - '), write(Name),
+                        write(' (Score: '), write(Score), writeln(')')))
             )
         ;
             write('Error checking qualified candidates.'), nl
@@ -153,34 +125,22 @@ input_job :-
         nl
     ).
 
-% Helper predicates
-read_number(Number) :-
-    read_line_to_string(user_input, Input),
-    (number_string(Number, Input) -> true ; (write('Invalid number! Try again: '), read_number(Number))).
-
-string_trim(String, Trimmed) :-
-    string_chars(String, Chars),
-    exclude(=(' '), Chars, TrimmedChars),
-    string_chars(Trimmed, TrimmedChars).
-
-display_job_details(ID, Title, Area, Course, MinCRA, MinSemester, Required, Desired, MinExp) :-
-    write('=== JOB DETAILS ==='), nl,
-    write('ID: '), write(ID), nl,
-    write('Title: '), write(Title), nl,
-    write('Area: '), write(Area), nl,
-    write('Target Course: '), write(Course), nl,
-    write('Minimum CRA: '), write(MinCRA), nl,
-    write('Minimum Semester: '), write(MinSemester), nl,
-    write('Required Skills: '), write(Required), nl,
-    write('Desired Skills: '), write(Desired), nl,
-    write('Minimum Experience: '), write(MinExp), write(' years'), nl, nl.
+% === Helper to validate input ===
+invalid_input(Title, Area, Course, MinCRA, MinSemester, MinExp) :-
+    ( Title == ""
+    ; Area == ""
+    ; Course == ""
+    ; MinCRA < 0
+    ; MinSemester < 1
+    ; MinExp < 0
+    ).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% 5. FILTER AND RANKING QUERIES %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 consult_qualified :-
-    write('Job ID: '), read(JobID),
+    io:ask_number('Job ID: ', JobID),
     filter:qualified_candidates(JobID, List),
     ( List == [] ->
         write('No qualified candidates found.'), nl
@@ -192,8 +152,8 @@ consult_qualified :-
     ).
 
 consult_best :-
-    write('Job ID: '), read(JobID),
-    write('How many candidates to list? '), read(N),
+    io:ask_number('Job ID: ', JobID),
+    io:ask_number('How many candidates to list? ', N),
     score:best_candidates(JobID, N, Best),
     ( Best == [] ->
         write('No qualified candidates found.'), nl
