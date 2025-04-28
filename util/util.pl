@@ -1,10 +1,10 @@
 :- module(util, [generate_job_id/1]).
 
-generate_job_id(NewID) :-
-    findall(ID, job(ID, _, _, _, _, _, _, _, _), IDs),
-    (IDs == [] ->
-        NewID = 1
+generate_job_id(ID) :-
+    findall(ExistingID, job(ExistingID, _, _, _, _, _, _, _), IDs),
+    ( IDs == [] ->
+        ID = 1
     ;
         max_list(IDs, MaxID),
-        NewID is MaxID + 1
+        ID is MaxID + 1
     ).

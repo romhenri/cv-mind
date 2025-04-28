@@ -1,7 +1,10 @@
-candidate(101, 'Ana Silva', 8.5, 5, 'ComputerEngineering', 2, ['Python','SQL','Docker'], ['Back','Data']).
-candidate(102, 'Bruno Costa', 7.8, 6, 'Statistics', 3, ['SQL','Excel','PowerBI'], ['Data']).
-candidate(103, 'Carla Souza', 9.0, 7, 'DataScience', 5, ['Python','R','MachineLearning'], ['Data']).
-candidate(104, 'Daniel Rocha', 8.2, 4, 'InformationSystems', 1, ['Java','SpringBoot'], ['Back']).
-candidate(105, 'Fernanda Lima', 7.5, 5, 'Mathematics', 2, ['SQL','R','Excel'], ['Data']).
-candidate(106, 'Gabriel Mendes', 9.3, 6, 'ComputerScience', 4, ['Python','C++','AIResearch'], ['Back','Research']).
-candidate(107, 'Larissa Pinto', 8.7, 3, 'SoftwareEngineering', 2, ['Python','Flutter','Git'], ['Mobile','Front']).
+candidate(101, 'Larissa Donato', 6.0, 3, 'CC', 2, ['Python','SQL','Docker'], ['Embarcados','Back','Data']).
+candidate(102, 'Rômulo Henrique ', 5.0, 3, 'CC', 4, ['Python','C++','C','TypeScript'], ['Front','Back','IA','Data']).
+candidate(103, 'Luiz Santos', 8.5, 2, 'CC', 2, ['Python','SQL','Java','Pandas','C','DeepLearning'], ['IA','Data']).
+candidate(104, 'Kevin Gabriel', 9.5, 2, 'CC', 2, ['Python','Java','C','HTML','CSS'], ['IA','Back']).
+candidate(105, 'Vinícius Victor', 9.0, 2, 'CC', 1, ['Python','SQL','Pandas','C++','C'], ['IA','Back','Data']).
+candidate(106, 'Rodrigo', 8.0, 2, 'CC', 1, ['Python','Java','C'], ['IA','Back','Data']).
+candidate(107, 'Pedro Paiva ', 9.0, 2, 'CC', 1, ['Python','Java','C++','C'], ['IA','Front','Back']).
+candidate(108, 'Ernandes ', 7.0, 3, 'CC', 2, ['Python','Excel','Java','C++','C','JavaScript','HTML','CSS'], ['IA','Front','Back','Mobile','Embarcados','DevOps','Data']).
+candidate(109, 'Gerson Freitas', 9.0, 2, 'CC', 1, ['Java','C','Microcontrollers','JavaScript','HTML','CSS'], ['IA','Front','Data']).
+candidate(110, 'Nicolas Kleiton ', 8.5, 2, 'CC', 1, ['Python','Java','C','Node.js','HTML','CSS'], ['IA','Back','Mobile']).

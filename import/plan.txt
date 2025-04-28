@@ -1,7 +1,10 @@
-Ana Silva	8.5	5	ComputerEngineering	2	Python,SQL,Docker	Back,Data
-Bruno Costa	7.8	6	Statistics	3	SQL,Excel,PowerBI	Data
-Carla Souza	9.0	7	DataScience	5	Python,R,MachineLearning	Data
-Daniel Rocha	8.2	4	InformationSystems	1	Java,SpringBoot	Back
-Fernanda Lima	7.5	5	Mathematics	2	SQL,R,Excel	Data
-Gabriel Mendes	9.3	6	ComputerScience	4	Python,C++,AIResearch	Back,Research
-Larissa Pinto	8.7	3	SoftwareEngineering	2	Python,Flutter,Git	Mobile,Front
+Larissa Donato	6	3	CC	2	Python, SQL, Docker	Embarcados, Back, Data
+Rômulo Henrique 	5	3	CC	4	Python, C++, C, TypeScript	Front, Back, IA, Data
+Luiz Santos	8.5	2	CC	2	Python, SQL, Java, Pandas, C, DeepLearning	IA, Data
+Kevin Gabriel	9.5	2	CC	2	Python, Java, C, HTML, CSS	IA, Back
+Vinícius Victor	9	2	CC	1	Python, SQL, Pandas, C++, C	IA, Back, Data
+Rodrigo	8	2	CC	1	Python, Java, C	IA, Back, Data
+Pedro Paiva 	9	2	CC	1	Python, Java, C++, C	IA, Front, Back
+Ernandes 	7	3	CC	2	Python, Excel, Java, C++, C, JavaScript, HTML, CSS	IA, Front, Back, Mobile, Embarcados, DevOps, Data
+Gerson Freitas	9	2	CC	1	Java, C, Microcontrollers, JavaScript, HTML, CSS	IA, Front, Data
+Nicolas Kleiton 	8.5	2	CC	1	Python, Java, C, Node.js, HTML, CSS	IA, Back, Mobile
