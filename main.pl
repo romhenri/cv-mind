@@ -130,7 +130,7 @@ invalid_input(Title, Area, Course, MinCRA, MinSemester, MinExp) :-
     ; Area == ""
     ; Course == ""
     ; MinCRA < 0
-    ; MinSemester < 1
+    ; MinSemester < 0
     ; MinExp < 0
     ).
 
